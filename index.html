@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="forkd - Your personal cooking companion.">
+    <title>forkd — Discover, Save & Cook</title>
+
+   <!-- <link rel="icon" type="image/png" href="assets/images/logo.png"> -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <a href="#" class="logo">
+                <img src="assets/images/logo.png" alt="forkd Logo">
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="#discover">Discover</a></li>
+                <li><a href="#collections">Collections</a></li>
+                <li><a href="#grocery-list">Grocery List</a></li>
+            </ul>
+
+            <div class="mobile-menu">
+                <a href="#discover">Discover</a>
+                <a href="#collections">Collections</a>
+                <a href="#grocery-list">Grocery List</a>
+
+                <div class="mobile-language">
+                    <button class="language-option active" type="button">EN</button>
+                    <button class="language-option" type="button">SQ</button>
+                </div>
+            </div>
+
+            <div class="language-switcher">
+                <button class="language-option active" type="button">EN</button>
+                <button class="language-option" type="button">SQ</button>
+            </div>
+
+            <button class="menu-toggle" aria-label="Open navigation menu">
+                <i data-lucide="menu"></i>
+            </button>
+        </nav>
+
+    </header>
+
+    <main>
+        <section class="hero" id="discover">
+            <div class="hero-content">
+                <p class="hero-label">fork this recipe!</p>
+                <h1>Find your next favorite dish.</h1>
+                <p class="hero-description">
+                    Discover recipes, collect your favorites, and make every meal a little more special.
+                </p>
+
+                <div class="hero-search">
+                    <input type="text" id="recipe-search" placeholder="Search for recipes or ingredients...">
+                    <button type="button" id="search-button">Search</button>
+                </div>
+            </div>
+
+            <div class="hero-image">
+                <img src="assets/images/hero-food.jpg" alt="Fresh homemade pasta served with herbs and vegetables">
+            </div>
+        </section>
+
+        <section class="categories" id="categories">
+            <div class="section-heading">
+                <div>
+                    <p class="section-label">WHAT ARE YOU CRAVING?</p>
+                    <h2>Explore by Category</h2>
+                </div>
+                <a href="#all-recipes" class="view-all">View all recipes →</a>
+            </div>
+
+            <div class="category-grid">
+                <a href="#breakfast" class="category-card">
+                    <img src="assets/images/category-breakfast.jpg" alt="Breakfast dishes">
+                    <h3>Breakfast</h3>
+                </a>
+
+                <a href="#lunch" class="category-card">
+                    <img src="assets/images/category-lunch.jpg" alt="Lunch dishes">
+                    <h3>Lunch</h3>
+                </a>
+
+                <a href="#dinner" class="category-card">
+                    <img src="assets/images/category-dinner.jpg" alt="Dinner dishes">
+                    <h3>Dinner</h3>
+                </a>
+
+                <a href="#desserts" class="category-card">
+                    <img src="assets/images/category-desserts.jpg" alt="Desserts">
+                    <h3>Desserts</h3>
+                </a>
+            </div>
+        </section>
+
+        <section class="popular-recipes" id="all-recipes">
+            <div class="section-heading">
+                <div>
+                    <p class="section-label">A LITTLE INSPIRATION</p>
+                    <h2 id="recipes-heading">Popular Recipes</h2>
+                </div>
+                <a href="#all-recipes" class="view-all">Explore all →</a>
+            </div>
+
+            <div class="recipe-grid" id="recipe-grid">
+                <!-- Recipe cards will be generated dynamically -->
+            </div>
+        </section>
+
+        <section class="seasonal" id="seasonal">
+            <div class="seasonal-image">
+                <img src="assets/images/seasonal-autumn.jpg" alt="Warm roasted pumpkin soup with fresh herbs">
+            </div>
+
+            <div class="seasonal-content">
+                <p class="section-label">IN SEASON</p>
+                <h2>A little taste of autumn.</h2>
+
+                <p class="seasonal-description">
+                    Cozy flavors, comforting dishes and seasonal ingredients. 
+                    Discover recipes that make this time of the year a little more delicious.
+                </p>
+
+                <a href="#all-recipes" class="seasonal-link">
+                    Explore seasonal recipes
+                    <i data-lucide="arrow-right"></i>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <footer class="footer">
+            <div class="footer-main">
+                <div class="footer-brand">
+                    <a href="#" class="footer-logo">forkd.</a>
+                    <p>Discover recipes, save your favorites and make something delicious.</p>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Explore</h3>
+                    <a href="#discover">Discover</a>
+                    <a href="#categories">Categories</a>
+                    <a href="#all-recipes">Popular Recipes</a>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Your Kitchen</h3>
+                    <a href="#collections">Collections</a>
+                    <a href="#grocery-list">Grocery List</a>
+                </div>
+
+                <div class="footer-note">
+                    <h3>A little reminder</h3>
+                    <p>Good food doesn't have to be complicated. Just start with something you love.</p>
+                </div>
+
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2026 forkd. Made with love for food.</p>
+                <a href="#discover">Back to top ↑</a>
+            </div>
+        </footer>
+    </footer>
+
+    <script type="module" src="js/main.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <script> lucide.createIcons(); </script>
+</body>
+</html>
