@@ -46,19 +46,23 @@ function renderRecipes(filteredRecipes = recipes) {
                 </div>
 
                 <div class="recipe-info">
-                    <p class="recipe-category">${recipe.category.toUpperCase()}</p>
-                    <h3>${recipe.title}</h3>
+                    <a href="pages/recipe.html?id=${recipe.id}" class="recipe-card-link">
+                        <div class="recipe-info">
+                            <p class="recipe-category">${recipe.category.toUpperCase()}</p>
+                            <h3>${recipe.title}</h3>
 
-                    <div class="recipe-meta">
-                        <span>
-                            <i data-lucide="clock"></i>
-                            ${totalTime} min
-                        </span>
-                        <span>
-                            <i data-lucide="chef-hat"></i>
-                            ${recipe.difficulty}
-                        </span>
-                    </div>
+                            <div class="recipe-meta">
+                                <span>
+                                    <i data-lucide="clock"></i>
+                                    ${totalTime} min
+                                </span>
+                                <span>
+                                    <i data-lucide="chef-hat"></i>
+                                    ${recipe.difficulty}
+                                </span>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </article>
         `;
