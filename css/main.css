@@ -856,3 +856,197 @@ input {
         gap: 12px;
     }
 }
+
+.collections {
+    padding: 80px 60px;
+    max-width: var(--container-width);
+    margin: 0 auto;
+}
+
+.collections-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-top: 35px;
+}
+
+.collection-card {
+    position: relative;
+    min-height: 230px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-beige);
+    border-radius: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.collection-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(53, 56, 49, 0.08);
+}
+
+.collection-card h3 {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: 8px;
+}
+
+.collection-card p {
+    color: var(--color-text-muted);
+    font-size: 13px;
+}
+
+.collection-icon {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #F1F3ED;
+    border-radius: 50%;
+    color: var(--color-primary);
+}
+
+.collection-icon i {
+    width: 19px;
+    height: 19px;
+}
+
+.create-collection-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.create-collection-btn:hover {
+    background-color: var(--color-text);
+}
+
+.create-collection-btn i {
+    width: 17px;
+    height: 17px;
+}
+
+/* Collection Modal */
+.collection-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background-color: rgba(53, 56, 49, 0.45);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.collection-modal.active {
+    display: flex;
+}
+
+.collection-modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+    background-color: var(--color-surface);
+    border-radius: 12px;
+}
+
+.collection-modal-content h3 {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 500;
+    margin: 10px 0;
+}
+
+.modal-description {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    margin-bottom: 25px;
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+}
+
+.close-modal-btn i {
+    width: 20px;
+    height: 20px;
+}
+
+#collection-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#collection-form label {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+#collection-name {
+    padding: 13px;
+    border: 1px solid var(--color-beige);
+    border-radius: 6px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    outline: none;
+}
+
+#collection-name:focus {
+    border-color: var(--color-primary);
+}
+
+.submit-collection-btn {
+    padding: 13px;
+    margin-top: 8px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-family: var(--font-body);
+    cursor: pointer;
+}
+
+.submit-collection-btn:hover {
+    background-color: var(--color-text);
+}
+
+@media (max-width: 768px) {
+    .collections-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .collections-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,5 +1,5 @@
-
 import { recipes } from './data/recipes.js';
+import { getGroceryList, saveGroceryList, getCollections, addRecipeToCollection, removeRecipeFromCollection } from './storage.js';
 
 const recipeDetails = document.querySelector('#recipe-details');
 
@@ -52,10 +52,17 @@ function renderRecipe() {
                     </span>
                 </div>
 
-                <button class="start-cooking-btn" id="start-cooking">
-                    <i data-lucide="chef-hat"></i>
-                    Start Cooking
-                </button>
+                <div class="recipe-actions">
+                    <button class="start-cooking-btn" id="start-cooking">
+                        <i data-lucide="chef-hat"></i>
+                        Start Cooking
+                    </button>
+
+                    <button class="save-collection-btn" id="save-to-collection">
+                        <i data-lucide="bookmark-plus"></i>
+                        Save to Collection
+                    </button>
+                </div>
             </div>
 
             <div class="recipe-hero-image">
@@ -70,15 +77,32 @@ function renderRecipe() {
                 <h2>Ingredients</h2>
 
                 <ul class="ingredients-list">
-                    ${recipe.ingredients.map(ingredient => `
+                    ${recipe.ingredients.map((ingredient, index) => `
                         <li>
-                            <span>${ingredient.name}</span>
-                            <span>
-                                ${ingredient.quantity} ${ingredient.unit}
-                            </span>
+                            <div class="ingredient-info">
+                                <span>${ingredient.name}</span>
+                                <span>
+                                    ${ingredient.quantity} ${ingredient.unit}
+                                </span>
+                            </div>
+
+                            <button
+                                class="add-ingredient-btn"
+                                data-index="${index}"
+                                type="button"
+                                aria-label="Add ${ingredient.name} to Grocery List"
+                            >
+                                <i data-lucide="plus"></i>
+                            </button>
                         </li>
                     `).join('')}
                 </ul>
+
+                <!-- Add All Ingredients -->
+                <button class="add-all-grocery-btn" id="add-all-grocery" type="button">
+                    <i data-lucide="shopping-basket"></i>
+                    Add All to Grocery List
+                </button>
             </section>
 
             <section class="instructions-section">
@@ -98,6 +122,31 @@ function renderRecipe() {
             </section>
 
         </div>
+
+        <div class="collection-modal" id="save-collection-modal">
+            <div class="collection-modal-content">
+
+                <button class="close-modal-btn" id="close-save-modal" type="button">
+                    <i data-lucide="x"></i>
+                </button>
+
+                <p class="section-label">YOUR PERSONAL COOKBOOK</p>
+                <h3>Save to Collection</h3>
+
+                <p class="modal-description">
+                    Choose where you want to save this recipe.
+                </p>
+
+                <div class="collection-options" id="collection-options">
+                    <!-- Collections will be displayed here -->
+                </div>
+
+                <button class="submit-collection-btn" id="confirm-save-collection" type="button">
+                    Save Recipe
+                </button>
+
+            </div>
+        </div>
     `;
 
     lucide.createIcons();
@@ -105,8 +154,150 @@ function renderRecipe() {
 
 renderRecipe();
 
-// Cooking Mode
+// Save Recipe to Collection
+const saveCollectionButton = document.querySelector('#save-to-collection');
+const saveCollectionModal = document.querySelector('#save-collection-modal');
+const closeSaveModalButton = document.querySelector('#close-save-modal');
+const collectionOptions = document.querySelector('#collection-options');
+const confirmSaveButton = document.querySelector('#confirm-save-collection');
 
+function renderCollectionOptions() {
+    const collections = getCollections();
+
+    if (collections.length === 0) {
+        collectionOptions.innerHTML = `
+            <p class="no-collections-message">
+                You haven't created any collections yet.
+                <a href="../index.html#collections">Create a collection</a>
+                first.
+            </p>
+        `;
+
+        confirmSaveButton.disabled = true;
+        return;
+    }
+
+    confirmSaveButton.disabled = false;
+
+    collectionOptions.innerHTML = collections.map(collection => {
+        const isSaved = collection.recipeIds.includes(recipe.id);
+
+        return `
+            <label class="collection-option">
+                <input
+                    type="checkbox"
+                    value="${collection.id}"
+                    ${isSaved ? 'checked' : ''}
+                >
+
+                <span>${collection.name}</span>
+            </label>
+        `;
+    }).join('');
+}
+
+// Open modal
+if (saveCollectionButton && recipe) {
+    saveCollectionButton.addEventListener('click', () => {
+        renderCollectionOptions();
+        saveCollectionModal.classList.add('active');
+        lucide.createIcons();
+    });
+}
+
+// Close modal
+closeSaveModalButton.addEventListener('click', () => {
+    saveCollectionModal.classList.remove('active');
+});
+
+// Close when clicking outside
+saveCollectionModal.addEventListener('click', event => {
+    if (event.target === saveCollectionModal) {
+        saveCollectionModal.classList.remove('active');
+    }
+});
+
+// Save selected collections
+confirmSaveButton.addEventListener('click', () => {
+    const collections = getCollections();
+
+    const selectedIds = [
+        ...collectionOptions.querySelectorAll('input:checked')
+    ].map(input => input.value);
+
+    collections.forEach(collection => {
+        if (selectedIds.includes(String(collection.id))) {
+            addRecipeToCollection(collection.id, recipe.id);
+        } else {
+            removeRecipeFromCollection(collection.id, recipe.id);
+        }
+    });
+
+    saveCollectionModal.classList.remove('active');
+});
+
+function addIngredientsToGroceryList(ingredients) {
+    const groceryList = getGroceryList();
+
+    const newIngredients = ingredients
+        .filter(ingredient => {
+            return !groceryList.some(item =>
+                item.recipeId === recipe.id &&
+                item.name.toLowerCase() === ingredient.name.toLowerCase()
+            );
+        })
+        .map(ingredient => ({
+            name: ingredient.name,
+            quantity: ingredient.quantity,
+            unit: ingredient.unit,
+            recipeId: recipe.id,
+            recipeTitle: recipe.title,
+            completed: false
+        }));
+
+    if (newIngredients.length === 0) {
+        return false;
+    }
+
+    saveGroceryList([...groceryList, ...newIngredients]);
+
+    return true;
+}
+
+// Add Individual Ingredient
+const ingredientButtons = document.querySelectorAll('.add-ingredient-btn');
+
+ingredientButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const index = Number(button.dataset.index);
+        const ingredient = recipe.ingredients[index];
+
+        addIngredientsToGroceryList([ingredient]);
+
+        button.innerHTML = '<i data-lucide="check"></i>';
+        button.disabled = true;
+        button.setAttribute('aria-label', 'Already added');
+
+        lucide.createIcons();
+    });
+});
+
+// Add All Ingredients
+const addAllButton = document.querySelector('#add-all-grocery');
+
+if (addAllButton && recipe) {
+    addAllButton.addEventListener('click', () => {
+        const wasAdded = addIngredientsToGroceryList(recipe.ingredients);
+
+        addAllButton.innerHTML = wasAdded
+            ? '<i data-lucide="check"></i> Added to Grocery List'
+            : '<i data-lucide="check"></i> Already Added';
+
+        lucide.createIcons();
+    });
+}
+
+// Cooking Mode
 const startCookingButton = document.querySelector('#start-cooking');
 
 function openCookingMode() {

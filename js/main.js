@@ -2,11 +2,88 @@
 import { recipes } from './data/recipes.js';
 import {
     getFavorites,
-    toggleFavorite
+    toggleFavorite,
+    getCollections,
+    createCollection
 } from './storage.js';
 
-// Recipe grid
 const recipeGrid = document.querySelector('#recipe-grid');
+const collectionsGrid = document.querySelector('#collections-grid');
+
+function renderCollections() {
+    const collections = getCollections();
+    const favorites = getFavorites();
+
+    const favoritesCollection = `
+        <a href="pages/collection.html?id=favorites" class="collection-card">
+            <div class="collection-icon">
+                <i data-lucide="heart"></i>
+            </div>
+
+            <h3>My Favorites</h3>
+            <p>${favorites.length} saved recipes</p>
+        </a>
+    `;
+
+    const customCollections = collections.map(collection => `
+        <a href="pages/collection.html?id=${collection.id}" class="collection-card">
+            <div class="collection-icon">
+                <i data-lucide="book-heart"></i>
+            </div>
+
+            <h3>${collection.name}</h3>
+            <p>${collection.recipeIds.length} recipes</p>
+        </a>
+    `).join('');
+
+    collectionsGrid.innerHTML = favoritesCollection + customCollections;
+
+    lucide.createIcons();
+}
+
+renderCollections();
+
+// Create Collection Modal
+const createCollectionBtn = document.querySelector('#create-collection-btn');
+const collectionModal = document.querySelector('#collection-modal');
+const closeModalBtn = document.querySelector('#close-modal-btn');
+const collectionForm = document.querySelector('#collection-form');
+const collectionNameInput = document.querySelector('#collection-name');
+
+// Open modal
+createCollectionBtn.addEventListener('click', () => {
+    collectionModal.classList.add('active');
+    collectionNameInput.focus();
+});
+
+// Close modal
+closeModalBtn.addEventListener('click', () => {
+    collectionModal.classList.remove('active');
+    collectionForm.reset();
+});
+
+// Close modal when clicking outside
+collectionModal.addEventListener('click', event => {
+    if (event.target === collectionModal) {
+        collectionModal.classList.remove('active');
+        collectionForm.reset();
+    }
+});
+
+// Create collection
+collectionForm.addEventListener('submit', event => {
+    event.preventDefault();
+
+    const collectionName = collectionNameInput.value.trim();
+
+    if (!collectionName) return;
+
+    createCollection(collectionName);
+
+    renderCollections();
+    collectionModal.classList.remove('active');
+    collectionForm.reset();
+});
 
 // Search elements
 const searchInput = document.querySelector('#recipe-search');
@@ -71,7 +148,6 @@ function renderRecipes(filteredRecipes = recipes) {
     lucide.createIcons();
 }
 
-// Initial recipe rendering
 renderRecipes();
 
 // Search functionality

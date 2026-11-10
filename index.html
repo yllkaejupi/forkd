@@ -16,20 +16,20 @@
 
     <header>
         <nav class="navbar">
-            <a href="#" class="logo">
+            <a href="index.html" class="logo">
                 <img src="assets/images/logo.png" alt="forkd Logo">
             </a>
 
             <ul class="nav-links">
                 <li><a href="#discover">Discover</a></li>
                 <li><a href="#collections">Collections</a></li>
-                <li><a href="#grocery-list">Grocery List</a></li>
+                <li><a href="pages/grocery-list.html">Grocery List</a></li>
             </ul>
 
             <div class="mobile-menu">
                 <a href="#discover">Discover</a>
                 <a href="#collections">Collections</a>
-                <a href="#grocery-list">Grocery List</a>
+                <a href="pages/grocery-list.html">Grocery List</a>
 
                 <div class="mobile-language">
                     <button class="language-option active" type="button">EN</button>
@@ -112,6 +112,54 @@
 
             <div class="recipe-grid" id="recipe-grid">
                 <!-- Recipe cards will be generated dynamically -->
+            </div>
+        </section>
+
+        <section class="collections" id="collections">
+            <div class="section-heading">
+                <div>
+                    <p class="section-label">YOUR PERSONAL COOKBOOK</p>
+                    <h2>Your Collections</h2>
+                </div>
+
+                <button class="create-collection-btn" id="create-collection-btn">
+                    <i data-lucide="plus"></i>
+                    New Collection
+                </button>
+            </div>
+
+            <div class="collection-modal" id="collection-modal">
+                <div class="collection-modal-content">
+                    <button class="close-modal-btn" id="close-modal-btn" type="button">
+                        <i data-lucide="x"></i>
+                    </button>
+
+                    <p class="section-label">YOUR PERSONAL COOKBOOK</p>
+                    <h3>Create a Collection</h3>
+                    <p class="modal-description">
+                        Give your collection a name to get started.
+                    </p>
+
+                    <form id="collection-form">
+                        <label for="collection-name">Collection Name</label>
+
+                        <input
+                            type="text"
+                            id="collection-name"
+                            placeholder="e.g. Quick Dinners"
+                            maxlength="30"
+                            required
+                        >
+
+                        <button type="submit" class="submit-collection-btn">
+                            Create Collection
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="collections-grid" id="collections-grid">
+                <!-- Collections will be generated dynamically -->
             </div>
         </section>
 
