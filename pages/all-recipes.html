@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browse every recipe on forkd.">
+
+    <title>All Recipes | forkd</title>
+
+    <link rel="icon" type="image/png" href="../assets/images/logo.png"> 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/pages/collection.css">
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar">
+            <a href="../index.html" class="logo">
+                <img src="../assets/images/logo.png" alt="forkd Logo">
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="../index.html#discover">Discover</a></li>
+                <li><a href="../index.html#collections">Collections</a></li>
+                <li><a href="grocery-list.html">Grocery List</a></li>
+            </ul>
+
+            <div class="mobile-menu">
+                <a href="../index.html#discover">Discover</a>
+                <a href="../index.html#collections">Collections</a>
+                <a href="grocery-list.html">Grocery List</a>
+
+                <div class="mobile-language">
+                    <button class="language-option active" type="button">EN</button>
+                    <button class="language-option" type="button">SQ</button>
+                </div>
+            </div>
+
+            <div class="language-switcher">
+                <button class="language-option active" type="button">EN</button>
+                <button class="language-option" type="button">SQ</button>
+            </div>
+
+            <button class="menu-toggle" aria-label="Open navigation menu">
+                <i data-lucide="menu"></i>
+            </button>
+        </nav>
+    </header>
+
+    <main class="collection-page">
+
+        <a href="../index.html#discover" class="back-link">
+            <i data-lucide="arrow-left"></i>
+            Back to Discover
+        </a>
+
+        <section class="collection-header">
+            <p class="section-label">THE FULL COOKBOOK</p>
+
+            <h1 id="all-recipes-title">All Recipes</h1>
+
+            <p id="all-recipes-count">0 recipes</p>
+        </section>
+
+        <section class="collection-recipes">
+            <div class="recipe-grid" id="all-recipes-grid">
+                <!-- Recipes will be rendered here -->
+            </div>
+        </section>
+
+    </main>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="module" src="../js/all-recipes.js"></script>
+
+</body>
+</html>

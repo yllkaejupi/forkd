@@ -8,6 +8,7 @@
 
     <title>Grocery List | forkd</title>
 
+    <link rel="icon" type="image/png" href="../assets/images/logo.png">
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/pages/grocery.css">
@@ -23,13 +24,38 @@
 
 <body>
 
-    <header class="navbar">
-        <a href="../index.html" class="logo">Y.</a>
+    <header>
+        <nav class="navbar">
+            <a href="../index.html" class="logo">
+                <img src="../assets/images/logo.png" alt="forkd Logo">
+            </a>
 
-        <a href="../index.html" class="back-link">
-            <i data-lucide="arrow-left"></i>
-            Back to Discover
-        </a>
+            <ul class="nav-links">
+                <li><a href="../index.html#discover">Discover</a></li>
+                <li><a href="../index.html#collections">Collections</a></li>
+                <li><a href="grocery-list.html">Grocery List</a></li>
+            </ul>
+
+            <div class="mobile-menu">
+                <a href="../index.html#discover">Discover</a>
+                <a href="../index.html#collections">Collections</a>
+                <a href="grocery-list.html">Grocery List</a>
+
+                <div class="mobile-language">
+                    <button class="language-option active" type="button">EN</button>
+                    <button class="language-option" type="button">SQ</button>
+                </div>
+            </div>
+
+            <div class="language-switcher">
+                <button class="language-option active" type="button">EN</button>
+                <button class="language-option" type="button">SQ</button>
+            </div>
+
+            <button class="menu-toggle" aria-label="Open navigation menu">
+                <i data-lucide="menu"></i>
+            </button>
+        </nav>
     </header>
 
     <main class="grocery-page">

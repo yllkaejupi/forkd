@@ -148,3 +148,21 @@ function attachGroceryEvents() {
 }
 
 renderGroceryList();
+
+// Mobile Navigation
+const menuToggle = document.querySelector('.menu-toggle');
+const mobileMenu = document.querySelector('.mobile-menu');
+
+if (menuToggle && mobileMenu) {
+    menuToggle.addEventListener('click', () => {
+        mobileMenu.classList.toggle('active');
+    });
+
+    const mobileLinks = mobileMenu.querySelectorAll('a');
+
+    mobileLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+        });
+    });
+}

@@ -1,3 +1,10 @@
+/*
+   Main
+   Base styles, CSS variables and the home-page sections
+   (hero, categories, seasonal, footer, collections).
+   Shared pieces (navbar, recipe cards, modals) live in components.css.
+*/
+
 * {
     margin: 0;
     padding: 0;
@@ -9,7 +16,7 @@ html {
 }
 
 :root {
-    /* Colors */
+    /* Color Palette */
     --color-background: #F8F6F0;
     --color-surface: #FFFFFF;
     --color-beige: #E9E3D7;
@@ -17,6 +24,9 @@ html {
     --color-accent: #C77D60;
     --color-text: #353831;
     --color-text-muted: #77796F;
+    --color-primary-dark: #66775F;
+    --color-primary-soft: #E6EAE2;
+    --color-accent-dark: #A4624A;
 
     /* Typography */
     --font-body: 'DM Sans', sans-serif;
@@ -45,152 +55,9 @@ input {
     font: inherit;
 }
 
-.navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 60px;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-}
-
-.logo img {
-    height: 100px;
-    width: auto;
-    display: block;
-    transition: transform 0.3s ease;
-}
-
-.logo:hover img {
-    transform: scale(1.05);
-}
-
-@media (max-width: 768px) {
-    .logo img {
-        height: 34px;
-    }
-}
-
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 35px;
-    list-style: none;
-}
-
-.nav-links a {
-    font-family: var(--font-body);
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--color-text);
-    text-decoration: none;
-}
-
-.language-switcher {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 5px;
-    background-color: var(--color-beige);
-    border-radius: 20px;
-}
-
-.language-option {
-    border: none;
-    background: transparent;
-    padding: 7px 12px;
-    border-radius: 16px;
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--color-text);
-    cursor: pointer;
-}
-
-.language-option.active {
-    background-color: var(--color-primary);
-    color: white;
-}
-
-.nav-links a:hover {
-    color: var(--color-accent);
-}
-
-.language-option:hover:not(.active) {
-    background-color: var(--color-beige);
-}
-
-.menu-toggle {
-    display: none;
-    background: none;
-    border: none;
-    color: var(--color-text);
-    cursor: pointer;
-    padding: 5px;
-}
-
-.menu-toggle svg {
-    width: 26px;
-    height: 26px;
-}
-
-.mobile-menu {
-    display: none;
-    flex-direction: column;
-    gap: 20px;
-    padding: 25px;
-    background-color: var(--color-beige);
-    border-radius: 12px;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.mobile-menu a {
-    color: var(--color-text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 16px;
-    text-decoration: none;
-}
-
-.mobile-language {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.mobile-menu.active {
-    display: flex;
-}
-
-@media (max-width: 768px) {
-    .navbar {
-        position: relative;
-        padding: 18px 24px;
-    }
-
-    .nav-links {
-        display: none;
-        gap: 18px;
-    }
-
-    .menu-toggle {
-       display: block;
-    }
-
-    .language-switcher {
-        display: none;
-    }
-
-    .mobile-menu {
-        position: absolute;
-        top: 100%;
-        left: 24px;
-        right: 24px;
-        z-index: 100;
-    }
-}
+/*
+   Hero (title, search bar, hero image)
+*/
 
 .hero {
     display: grid;
@@ -249,7 +116,6 @@ input {
     outline: none;
     padding: 12px 16px;
     background: transparent;
-    font-family: 'DM Sans', sans-serif;
     font-size: 16px;
 }
 
@@ -259,7 +125,6 @@ input {
     border-radius: 30px;
     background-color: var(--color-primary);
     color: white;
-    font-family: 'DM Sans', sans-serif;
     font-weight: 500;
     cursor: pointer;
 }
@@ -299,8 +164,6 @@ input {
     }
 
     .hero-search input {
-        flex: 1;
-        min-width: 0;
         font-size: 14px;
         padding: 12px 10px;
     }
@@ -312,7 +175,6 @@ input {
     }
 
     .hero-image {
-        width: 100%;
         height: 380px;
     }
 }
@@ -396,6 +258,10 @@ input {
 .view-all:hover {
     color: var(--color-accent);
 }
+
+/*
+   Categories (Breakfast, Lunch, Dinner, Desserts cards)
+*/
 
 .category-grid {
     display: grid;
@@ -485,151 +351,9 @@ input {
     }
 }
 
-.recipe-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 25px;
-}
-
-.recipe-card {
-    min-width: 0;
-}
-
-.recipe-image {
-    position: relative;
-    width: 100%;
-    height: 280px;
-    overflow: hidden;
-    border-radius: 12px;
-}
-
-.recipe-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.4s ease;
-}
-
-.recipe-card:hover .recipe-image img {
-    transform: scale(1.04);
-}
-
-.favorite-btn {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    border: none;
-    border-radius: 50%;
-    background-color: white;
-    color: var(--color-text);
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.favorite-btn:hover {
-    background-color: var(--color-accent);
-    color: white;
-}
-
-.favorite-btn.active {
-    background-color: var(--color-accent);
-    color: white;
-}
-
-.favorite-btn svg {
-    width: 19px;
-    height: 19px;
-}
-
-.recipe-info {
-    padding-top: 16px;
-}
-
-.recipe-category {
-    color: var(--color-primary);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    margin-bottom: 5px;
-}
-
-.recipe-info h3 {
-    font-family: var(--font-heading);
-    font-size: 21px;
-    font-weight: 600;
-    line-height: 1.3;
-    margin-bottom: 12px;
-}
-
-.recipe-meta {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    color: var(--color-text-muted);
-    font-size: 13px;
-}
-
-.recipe-meta span {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.recipe-meta svg {
-    width: 15px;
-    height: 15px;
-    color: var(--color-primary);
-}
-
-@media (max-width: 900px) {
-    .recipe-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 35px 20px;
-    }
-
-    .recipe-image {
-        height: 260px;
-    }
-}
-
-@media (max-width: 768px) {
-    .recipe-image {
-        height: 220px;
-    }
-}
-
-@media (max-width: 480px) {
-    .recipe-grid {
-        gap: 30px 15px;
-    }
-
-    .recipe-image {
-        height: 170px;
-    }
-
-    .recipe-info h3 {
-        font-size: 18px;
-    }
-
-    .recipe-meta {
-        flex-wrap: wrap;
-        gap: 8px 12px;
-        font-size: 12px;
-    }
-
-    .favorite-btn {
-        width: 34px;
-        height: 34px;
-        top: 10px;
-        right: 10px;
-    }
-}
+/*
+   Seasonal section
+*/
 
 .seasonal {
     display: grid;
@@ -750,6 +474,10 @@ input {
     }
 }
 
+/*
+   Footer
+*/
+
 .footer {
     padding: 60px 60px 25px;
     background-color: var(--color-beige);
@@ -857,6 +585,10 @@ input {
     }
 }
 
+/*
+   Collections section (home page)
+*/
+
 .collections {
     padding: 80px 60px;
     max-width: var(--container-width);
@@ -877,30 +609,34 @@ input {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-beige);
+    background-color: var(--color-primary);
     border-radius: 12px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    text-decoration: none;
-    color: inherit;
+    color: var(--color-surface);
+}
+
+/* My Favorites is always the first card, so it gets terracotta */
+.collection-card:first-child {
+    background-color: var(--color-accent);
 }
 
 .collection-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(53, 56, 49, 0.08);
+    box-shadow: 0 8px 25px rgba(53, 56, 49, 0.15);
 }
 
 .collection-card h3 {
     font-family: var(--font-heading);
     font-size: 24px;
     font-weight: 500;
-    color: var(--color-text);
+    color: var(--color-surface);
     margin-bottom: 8px;
 }
 
 .collection-card p {
-    color: var(--color-text-muted);
-    font-size: 13px;
+    color: var(--color-surface);
+    font-size: 14px;
+    font-weight: 500;
 }
 
 .collection-icon {
@@ -912,12 +648,12 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #F1F3ED;
+    background-color: rgba(255, 255, 255, 0.22);
     border-radius: 50%;
-    color: var(--color-primary);
+    color: var(--color-surface);
 }
 
-.collection-icon i {
+.collection-icon svg {
     width: 19px;
     height: 19px;
 }
@@ -931,7 +667,6 @@ input {
     color: white;
     border: none;
     border-radius: 6px;
-    font-family: var(--font-body);
     font-size: 13px;
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -941,63 +676,13 @@ input {
     background-color: var(--color-text);
 }
 
-.create-collection-btn i {
+.create-collection-btn svg {
     width: 17px;
     height: 17px;
 }
 
-/* Collection Modal */
-.collection-modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    background-color: rgba(53, 56, 49, 0.45);
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.collection-modal.active {
-    display: flex;
-}
-
-.collection-modal-content {
-    position: relative;
-    width: 100%;
-    max-width: 420px;
-    padding: 40px;
-    background-color: var(--color-surface);
-    border-radius: 12px;
-}
-
-.collection-modal-content h3 {
-    font-family: var(--font-heading);
-    font-size: 28px;
-    font-weight: 500;
-    margin: 10px 0;
-}
-
-.modal-description {
-    color: var(--color-text-muted);
-    font-size: 13px;
-    margin-bottom: 25px;
-}
-
-.close-modal-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--color-text-muted);
-}
-
-.close-modal-btn i {
-    width: 20px;
-    height: 20px;
-}
+/* Create Collection modal form (home page only).
+    The modal box itself is styled in components.css */
 
 #collection-form {
     display: flex;
@@ -1014,28 +699,12 @@ input {
     padding: 13px;
     border: 1px solid var(--color-beige);
     border-radius: 6px;
-    font-family: var(--font-body);
     font-size: 14px;
     outline: none;
 }
 
 #collection-name:focus {
     border-color: var(--color-primary);
-}
-
-.submit-collection-btn {
-    padding: 13px;
-    margin-top: 8px;
-    background-color: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-family: var(--font-body);
-    cursor: pointer;
-}
-
-.submit-collection-btn:hover {
-    background-color: var(--color-text);
 }
 
 @media (max-width: 768px) {

@@ -1,14 +1,9 @@
-
 import { recipes } from './data/recipes.js';
-import {
-    getFavorites,
-    toggleFavorite,
-    getCollections,
-    createCollection
-} from './storage.js';
+import { getFavorites, toggleFavorite, getCollections, createCollection } from './storage.js';
 
 const recipeGrid = document.querySelector('#recipe-grid');
 const collectionsGrid = document.querySelector('#collections-grid');
+const popularRecipes = recipes.filter(recipe => recipe.popular).slice(0, 8);
 
 function renderCollections() {
     const collections = getCollections();
@@ -90,7 +85,7 @@ const searchInput = document.querySelector('#recipe-search');
 const searchButton = document.querySelector('#search-button');
 
 // Render recipes
-function renderRecipes(filteredRecipes = recipes) {
+function renderRecipes(filteredRecipes = popularRecipes) {
     const favorites = getFavorites();
 
     if (filteredRecipes.length === 0) {
@@ -154,17 +149,19 @@ renderRecipes();
 function searchRecipes() {
     const searchTerm = searchInput.value.trim().toLowerCase();
 
-    const filteredRecipes = recipes.filter(recipe => {
-        const searchableContent = [
-            recipe.title,
-            recipe.description,
-            recipe.category,
-            ...recipe.ingredients.map(ingredient => ingredient.name),
-            ...recipe.tags
-        ].join(' ').toLowerCase();
+    const filteredRecipes = searchTerm
+        ? recipes.filter(recipe => {
+            const searchableContent = [
+                recipe.title,
+                recipe.description,
+                recipe.category,
+                ...recipe.ingredients.map(ingredient => ingredient.name),
+                ...recipe.tags
+            ].join(' ').toLowerCase();
 
-        return searchableContent.includes(searchTerm);
-    });
+            return searchableContent.includes(searchTerm);
+        })
+        : popularRecipes;
 
     renderRecipes(filteredRecipes);
 
@@ -175,7 +172,7 @@ function searchRecipes() {
         : 'Popular Recipes';
 
     if (searchTerm) {
-        document.querySelector('#all-recipes').scrollIntoView({
+        document.querySelector('#popular-recipes').scrollIntoView({
             behavior: 'smooth'
         });
     }

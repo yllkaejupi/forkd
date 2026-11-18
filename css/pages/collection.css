@@ -1,3 +1,9 @@
+/* Collection & All Recipes pages */
+
+body:has(.collection-page) {
+    background-color: var(--color-primary-soft);
+}
+
 .collection-page {
     max-width: var(--container-width);
     margin: 0 auto;
@@ -5,37 +11,90 @@
 }
 
 .collection-page .back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.collection-page .back-link:hover {
+    color: var(--color-accent);
 }
 
 .collection-header {
-    padding-bottom: 35px;
-    border-bottom: 1px solid var(--color-beige);
+    padding: 44px 48px;
+    background-color: var(--color-primary-dark);
+    border-radius: 16px;
+}
+
+.collection-header .section-label {
+    color: var(--color-surface);
 }
 
 .collection-header h1 {
     font-family: var(--font-heading);
     font-size: 48px;
     font-weight: 500;
-    color: var(--color-text);
+    color: var(--color-surface);
     margin: 12px 0;
 }
 
-.collection-header p:last-child {
-    color: var(--color-text-muted);
-    font-size: 14px;
+.collection-header p:not(.section-label) {
+    color: var(--color-surface);
+    font-size: 15px;
+    font-weight: 500;
 }
 
 .collection-recipes {
-    padding-top: 35px;
+    padding-top: 40px;
+}
+
+/* Recipe cards (scoped to these pages so the home page stays unchanged) */
+.collection-page .recipe-card {
+    background-color: var(--color-surface);
+    border: 1px solid transparent;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.collection-page .recipe-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-primary);
+    box-shadow: 0 10px 25px rgba(53, 56, 49, 0.1);
+}
+
+.collection-page .recipe-image {
+    border-radius: 0;
+}
+
+.collection-page .recipe-info {
+    padding: 18px 20px 22px;
+}
+
+.collection-page .recipe-category {
+    color: var(--color-accent);
+}
+
+/* Empty state */
+.collection-page .no-results {
+    grid-column: 1 / -1;
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 15px;
+    background-color: var(--color-surface);
+    border-radius: 14px;
 }
 
 @media (max-width: 768px) {
     .collection-page {
         padding: 30px 25px 60px;
+    }
+
+    .collection-header {
+        padding: 32px 28px;
     }
 
     .collection-header h1 {
@@ -46,6 +105,10 @@
 @media (max-width: 480px) {
     .collection-page {
         padding: 25px 20px 50px;
+    }
+
+    .collection-header {
+        padding: 26px 22px;
     }
 
     .collection-header h1 {
@@ -67,14 +130,15 @@
     border-radius: 50%;
     color: var(--color-text);
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .remove-collection-recipe-btn:hover {
-    background-color: var(--color-beige);
+    background-color: var(--color-accent);
+    color: var(--color-surface);
 }
 
-.remove-collection-recipe-btn i {
+.remove-collection-recipe-btn svg {
     width: 18px;
     height: 18px;
 }
@@ -83,39 +147,41 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-top: 20px;
+    margin-top: 24px;
 }
 
 .collection-management button {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    padding: 9px 14px;
+    padding: 9px 16px;
     background: transparent;
-    border: 1px solid var(--color-beige);
+    border: 1px solid rgba(255, 255, 255, 0.55);
     border-radius: 6px;
-    color: var(--color-text);
-    font-family: var(--font-body);
+    color: var(--color-surface);
     font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .collection-management button:hover {
-    background-color: var(--color-beige);
+    background-color: var(--color-surface);
+    border-color: var(--color-surface);
+    color: var(--color-primary-dark);
 }
 
-.collection-management button i {
+.collection-management button svg {
     width: 15px;
     height: 15px;
 }
 
 #delete-collection-btn:hover {
-    color: #B94A48;
-    border-color: #B94A48;
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-surface);
 }
 
-/* Rename & Delete Modals */
 #rename-modal input {
     width: 100%;
     padding: 13px 15px;
@@ -123,7 +189,6 @@
     border: 1px solid var(--color-beige);
     border-radius: 8px;
     background: var(--color-background);
-    font-family: inherit;
     font-size: 14px;
     color: var(--color-text);
     outline: none;
@@ -156,13 +221,12 @@
     padding: 12px 18px;
     border: none;
     border-radius: 8px;
-    font-family: inherit;
     font-size: 13px;
     cursor: pointer;
 }
 
 #cancel-delete {
-    background: var(--color-beige);
+    background: var(--color-primary-soft);
     color: var(--color-text);
 }
 
