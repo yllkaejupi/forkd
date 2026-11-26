@@ -239,3 +239,130 @@ body:has(.collection-page) {
 #confirm-delete:hover {
     opacity: 0.85;
 }
+/*
+   Filters (All Recipes page)
+*/
+
+.recipe-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-top: 30px;
+    padding: 28px;
+    background-color: var(--color-surface);
+    border-radius: 16px;
+}
+
+/* Search box with the magnifying glass inside it */
+.filter-search {
+    position: relative;
+}
+
+.filter-search svg {
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    width: 18px;
+    height: 18px;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+    pointer-events: none;
+}
+
+.filter-search input {
+    width: 100%;
+    padding: 13px 16px 13px 44px;
+    border: 1px solid var(--color-beige);
+    border-radius: 50px;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-size: 14px;
+    outline: none;
+}
+
+.filter-search input:focus {
+    border-color: var(--color-primary);
+}
+
+/* One row: label + chips */
+.filter-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+}
+
+.filter-label {
+    min-width: 100px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-chip {
+    padding: 8px 16px;
+    border: 1px solid var(--color-beige);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--color-text);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.filter-chip:hover {
+    border-color: var(--color-primary);
+}
+
+.filter-chip.active {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+
+/* Clear filters (in the panel and in the empty state) */
+.clear-filters-btn {
+    align-self: flex-start;
+    padding: 8px 18px;
+    border: 1.5px solid var(--color-accent);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--color-accent-dark);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.clear-filters-btn:hover {
+    background-color: var(--color-accent);
+    color: white;
+}
+
+/* "hidden" must win over the display rules above */
+.clear-filters-btn[hidden] {
+    display: none;
+}
+
+.no-results .clear-filters-btn {
+    margin-top: 16px;
+}
+
+@media (max-width: 480px) {
+    .recipe-filters {
+        padding: 20px;
+    }
+
+    .filter-label {
+        min-width: 100%;
+    }
+}

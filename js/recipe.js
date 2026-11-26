@@ -1,5 +1,7 @@
 import { recipes } from './data/recipes.js';
 import { getGroceryList, saveGroceryList, getCollections, addRecipeToCollection, removeRecipeFromCollection } from './storage.js';
+import { onPageRestore, escapeHTML, initMobileNav, formatAmount } from './ui.js';
+import { initLanguage, onLanguageChange, t, localize } from './i18n/language.js';
 
 const recipeDetails = document.querySelector('#recipe-details');
 
@@ -8,65 +10,82 @@ const recipeId = Number(params.get('id'));
 
 const recipe = recipes.find(recipe => recipe.id === recipeId);
 
+// =====================================================
+// Render
+// Draws the whole recipe page. Called on load, when the
+// language changes and when the page is restored.
+// Because this replaces all the HTML inside #recipe-details,
+// clicks are handled with ONE delegated listener further down
+// (listeners attached to individual buttons would be lost).
+// =====================================================
+
 function renderRecipe() {
     if (!recipe) {
+        document.title = `${t('recipe.notFoundTitle')} | forkd`;
+
         recipeDetails.innerHTML = `
             <div class="recipe-not-found">
-                <h2>Recipe not found</h2>
-                <a href="../index.html">Back to Discover</a>
+                <h2>${t('recipe.notFoundTitle')}</h2>
+                <p>${t('recipe.notFoundText')}</p>
+                <a href="all-recipes.html" class="view-all">${t('recipe.browseAll')}</a>
             </div>
         `;
+        lucide.createIcons();
         return;
     }
 
     const totalTime = recipe.prepTime + recipe.cookTime;
+    const title = localize(recipe.title);
+
+    // Browser tab shows the recipe name, e.g. "Pasta Bolognese | forkd"
+    document.title = `${title} | forkd`;
 
     recipeDetails.innerHTML = `
         <div class="recipe-hero">
 
             <div class="recipe-hero-content">
                 <p class="recipe-category">
-                    ${recipe.category.toUpperCase()}
+                    ${t(`categories.${recipe.category}`).toUpperCase()}
                 </p>
 
-                <h1>${recipe.title}</h1>
+                <h1>${title}</h1>
 
                 <p class="recipe-description">
-                    ${recipe.description}
+                    ${localize(recipe.description)}
                 </p>
 
                 <div class="recipe-meta">
                     <span>
                         <i data-lucide="clock"></i>
-                        ${totalTime} min
+                        ${t('common.minutes', { count: totalTime })}
                     </span>
 
                     <span>
                         <i data-lucide="users"></i>
-                        ${recipe.servings} servings
+                        ${t('recipe.servings', { count: recipe.servings })}
                     </span>
 
                     <span>
                         <i data-lucide="chef-hat"></i>
-                        ${recipe.difficulty}
+                        ${t(`difficulty.${recipe.difficulty}`)}
                     </span>
                 </div>
 
                 <div class="recipe-actions">
-                    <button class="start-cooking-btn" id="start-cooking">
+                    <button class="start-cooking-btn" id="start-cooking" type="button">
                         <i data-lucide="chef-hat"></i>
-                        Start Cooking
+                        ${t('recipe.startCooking')}
                     </button>
 
-                    <button class="save-collection-btn" id="save-to-collection">
+                    <button class="save-collection-btn" id="save-to-collection" type="button">
                         <i data-lucide="bookmark-plus"></i>
-                        Save to Collection
+                        ${t('recipe.saveToCollection')}
                     </button>
                 </div>
             </div>
 
             <div class="recipe-hero-image">
-                <img src="../${recipe.image}" alt="${recipe.title}">
+                <img src="../${recipe.image}" alt="${title}">
             </div>
 
         </div>
@@ -74,42 +93,37 @@ function renderRecipe() {
         <div class="recipe-content">
 
             <section class="ingredients-section">
-                <h2>Ingredients</h2>
+                <h2>${t('recipe.ingredients')}</h2>
 
                 <ul class="ingredients-list">
                     ${recipe.ingredients.map((ingredient, index) => `
                         <li>
                             <div class="ingredient-info">
-                                <span>${ingredient.name}</span>
+                                <span>${localize(ingredient.name)}</span>
                                 <span>
-                                    ${ingredient.quantity} ${ingredient.unit}
+                                    ${formatAmount(ingredient.quantity, ingredient.unit)}
                                 </span>
                             </div>
 
+                            <!-- Icon + label are filled in by setButtonState() -->
                             <button
                                 class="add-ingredient-btn"
                                 data-index="${index}"
                                 type="button"
-                                aria-label="Add ${ingredient.name} to Grocery List"
-                            >
-                                <i data-lucide="plus"></i>
-                            </button>
+                            ></button>
                         </li>
                     `).join('')}
                 </ul>
 
-                <!-- Add All Ingredients -->
-                <button class="add-all-grocery-btn" id="add-all-grocery" type="button">
-                    <i data-lucide="shopping-basket"></i>
-                    Add All to Grocery List
-                </button>
+                <!-- Label is filled in by updateAddAllButton() -->
+                <button class="add-all-grocery-btn" id="add-all-grocery" type="button"></button>
             </section>
 
             <section class="instructions-section">
-                <h2>Instructions</h2>
+                <h2>${t('recipe.instructions')}</h2>
 
                 <div class="instructions-list">
-                    ${recipe.steps.map((step, index) => `
+                    ${localize(recipe.steps).map((step, index) => `
                         <div class="instruction-step">
                             <span class="step-number">
                                 ${String(index + 1).padStart(2, '0')}
@@ -126,15 +140,15 @@ function renderRecipe() {
         <div class="collection-modal" id="save-collection-modal">
             <div class="collection-modal-content">
 
-                <button class="close-modal-btn" id="close-save-modal" type="button">
+                <button class="close-modal-btn" id="close-save-modal" type="button" aria-label="${t('common.close')}">
                     <i data-lucide="x"></i>
                 </button>
 
-                <p class="section-label">YOUR PERSONAL COOKBOOK</p>
-                <h3>Save to Collection</h3>
+                <p class="section-label">${t('collections.label')}</p>
+                <h3>${t('recipe.saveToCollection')}</h3>
 
                 <p class="modal-description">
-                    Choose where you want to save this recipe.
+                    ${t('recipe.saveDescription')}
                 </p>
 
                 <div class="collection-options" id="collection-options">
@@ -142,34 +156,139 @@ function renderRecipe() {
                 </div>
 
                 <button class="submit-collection-btn" id="confirm-save-collection" type="button">
-                    Save Recipe
+                    ${t('recipe.saveButton')}
                 </button>
 
             </div>
         </div>
     `;
 
+    // Draws the + / ✓ buttons, "Add All", and all icons
+    refreshGroceryButtons();
+}
+
+// =====================================================
+// Grocery List
+// =====================================================
+
+// Grocery items only store WHICH ingredient they are:
+//   { recipeId: 7, ingredientIndex: 2, completed: false }
+// The name, amount and unit are looked up from recipes.js when the
+// list is displayed, so they always appear in the current language.
+
+// Positions of every ingredient in this recipe: [0, 1, 2, ...]
+function getAllIngredientIndexes() {
+    return recipe.ingredients.map((ingredient, index) => index);
+}
+
+// One place that answers "is this ingredient from THIS recipe
+// already on the list?"
+function isInGroceryList(groceryList, ingredientIndex) {
+    return groceryList.some(item =>
+        item.recipeId === recipe.id &&
+        item.ingredientIndex === ingredientIndex
+    );
+}
+
+function addIngredientsToGroceryList(ingredientIndexes) {
+    const groceryList = getGroceryList();
+
+    const newItems = ingredientIndexes
+        .filter(index => !isInGroceryList(groceryList, index))
+        .map(index => ({
+            recipeId: recipe.id,
+            ingredientIndex: index,
+            completed: false
+        }));
+
+    if (newItems.length === 0) {
+        return false;
+    }
+
+    saveGroceryList([...groceryList, ...newItems]);
+
+    return true;
+}
+
+// The opposite of adding: keep every item EXCEPT the one
+// that matches this ingredient from this recipe.
+function removeIngredientFromGroceryList(ingredientIndex) {
+    const groceryList = getGroceryList();
+
+    const updatedList = groceryList.filter(item =>
+        !(item.recipeId === recipe.id && item.ingredientIndex === ingredientIndex)
+    );
+
+    saveGroceryList(updatedList);
+}
+
+// The ONE function that decides how an ingredient button looks.
+// isAdded = true  → ✓ (click to remove)
+// isAdded = false → + (click to add)
+function setButtonState(button, isAdded) {
+    const ingredient = recipe.ingredients[Number(button.dataset.index)];
+    const name = localize(ingredient.name);
+
+    button.innerHTML = `<i data-lucide="${isAdded ? 'check' : 'plus'}"></i>`;
+    button.classList.toggle('added', isAdded);
+    button.setAttribute('aria-pressed', isAdded);
+    button.setAttribute(
+        'aria-label',
+        t(isAdded ? 'recipe.removeIngredient' : 'recipe.addIngredient', { name })
+    );
+}
+
+// "Add All" shows whether everything is already on the list
+function updateAddAllButton(groceryList) {
+    const addAllButton = document.querySelector('#add-all-grocery');
+
+    const allAdded = getAllIngredientIndexes().every(index =>
+        isInGroceryList(groceryList, index)
+    );
+
+    addAllButton.innerHTML = allAdded
+        ? `<i data-lucide="check"></i> ${t('recipe.allAdded')}`
+        : `<i data-lucide="shopping-basket"></i> ${t('recipe.addAll')}`;
+}
+
+// Draw every ingredient button (and Add All) from what's saved right now.
+// The buttons are looked up fresh each time, because renderRecipe()
+// may have replaced them since the last call.
+function refreshGroceryButtons() {
+    const groceryList = getGroceryList();
+
+    document.querySelectorAll('.add-ingredient-btn').forEach(button => {
+        const index = Number(button.dataset.index);
+        setButtonState(button, isInGroceryList(groceryList, index));
+    });
+
+    updateAddAllButton(groceryList);
     lucide.createIcons();
 }
 
-renderRecipe();
+function toggleIngredient(index) {
+    // Ask storage, not the button, what the current state is
+    if (isInGroceryList(getGroceryList(), index)) {
+        removeIngredientFromGroceryList(index);
+    } else {
+        addIngredientsToGroceryList([index]);
+    }
+
+    refreshGroceryButtons();
+}
 
 // Save Recipe to Collection
-const saveCollectionButton = document.querySelector('#save-to-collection');
-const saveCollectionModal = document.querySelector('#save-collection-modal');
-const closeSaveModalButton = document.querySelector('#close-save-modal');
-const collectionOptions = document.querySelector('#collection-options');
-const confirmSaveButton = document.querySelector('#confirm-save-collection');
 
 function renderCollectionOptions() {
+    const collectionOptions = document.querySelector('#collection-options');
+    const confirmSaveButton = document.querySelector('#confirm-save-collection');
     const collections = getCollections();
 
     if (collections.length === 0) {
         collectionOptions.innerHTML = `
             <p class="no-collections-message">
-                You haven't created any collections yet.
-                <a href="../index.html#collections">Create a collection</a>
-                first.
+                ${t('recipe.noCollections')}
+                <a href="../index.html#collections">${t('recipe.createFirst')}</a>
             </p>
         `;
 
@@ -190,39 +309,26 @@ function renderCollectionOptions() {
                     ${isSaved ? 'checked' : ''}
                 >
 
-                <span>${collection.name}</span>
+                <span>${escapeHTML(collection.name)}</span>
             </label>
         `;
     }).join('');
 }
 
-// Open modal
-if (saveCollectionButton && recipe) {
-    saveCollectionButton.addEventListener('click', () => {
-        renderCollectionOptions();
-        saveCollectionModal.classList.add('active');
-        lucide.createIcons();
-    });
+function openSaveModal() {
+    renderCollectionOptions();
+    document.querySelector('#save-collection-modal').classList.add('active');
 }
 
-// Close modal
-closeSaveModalButton.addEventListener('click', () => {
-    saveCollectionModal.classList.remove('active');
-});
+function closeSaveModal() {
+    document.querySelector('#save-collection-modal').classList.remove('active');
+}
 
-// Close when clicking outside
-saveCollectionModal.addEventListener('click', event => {
-    if (event.target === saveCollectionModal) {
-        saveCollectionModal.classList.remove('active');
-    }
-});
-
-// Save selected collections
-confirmSaveButton.addEventListener('click', () => {
+function saveSelectedCollections() {
     const collections = getCollections();
 
     const selectedIds = [
-        ...collectionOptions.querySelectorAll('input:checked')
+        ...document.querySelectorAll('#collection-options input:checked')
     ].map(input => input.value);
 
     collections.forEach(collection => {
@@ -233,77 +339,16 @@ confirmSaveButton.addEventListener('click', () => {
         }
     });
 
-    saveCollectionModal.classList.remove('active');
-});
-
-function addIngredientsToGroceryList(ingredients) {
-    const groceryList = getGroceryList();
-
-    const newIngredients = ingredients
-        .filter(ingredient => {
-            return !groceryList.some(item =>
-                item.recipeId === recipe.id &&
-                item.name.toLowerCase() === ingredient.name.toLowerCase()
-            );
-        })
-        .map(ingredient => ({
-            name: ingredient.name,
-            quantity: ingredient.quantity,
-            unit: ingredient.unit,
-            recipeId: recipe.id,
-            recipeTitle: recipe.title,
-            completed: false
-        }));
-
-    if (newIngredients.length === 0) {
-        return false;
-    }
-
-    saveGroceryList([...groceryList, ...newIngredients]);
-
-    return true;
-}
-
-// Add Individual Ingredient
-const ingredientButtons = document.querySelectorAll('.add-ingredient-btn');
-
-ingredientButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        const index = Number(button.dataset.index);
-        const ingredient = recipe.ingredients[index];
-
-        addIngredientsToGroceryList([ingredient]);
-
-        button.innerHTML = '<i data-lucide="check"></i>';
-        button.disabled = true;
-        button.setAttribute('aria-label', 'Already added');
-
-        lucide.createIcons();
-    });
-});
-
-// Add All Ingredients
-const addAllButton = document.querySelector('#add-all-grocery');
-
-if (addAllButton && recipe) {
-    addAllButton.addEventListener('click', () => {
-        const wasAdded = addIngredientsToGroceryList(recipe.ingredients);
-
-        addAllButton.innerHTML = wasAdded
-            ? '<i data-lucide="check"></i> Added to Grocery List'
-            : '<i data-lucide="check"></i> Already Added';
-
-        lucide.createIcons();
-    });
+    closeSaveModal();
 }
 
 // Cooking Mode
-const startCookingButton = document.querySelector('#start-cooking');
 
 function openCookingMode() {
     let currentStep = 0;
 
-    const totalSteps = recipe.steps.length;
+    const steps = localize(recipe.steps);
+    const totalSteps = steps.length;
 
     const cookingMode = document.createElement('div');
     cookingMode.classList.add('cooking-mode');
@@ -316,17 +361,17 @@ function openCookingMode() {
         cookingMode.innerHTML = `
             <div class="cooking-container">
 
-                <button class="close-cooking" aria-label="Close cooking mode">
+                <button class="close-cooking" type="button" aria-label="${t('cooking.close')}">
                     <i data-lucide="x"></i>
                 </button>
 
-                <p class="cooking-label">COOKING MODE</p>
+                <p class="cooking-label">${t('cooking.label')}</p>
 
-                <h2>${recipe.title}</h2>
+                <h2>${localize(recipe.title)}</h2>
 
                 <div class="cooking-progress">
                     <div class="progress-info">
-                        <span>Step ${currentStep + 1} of ${totalSteps}</span>
+                        <span>${t('cooking.step', { current: currentStep + 1, total: totalSteps })}</span>
                         <span>${Math.round(progress)}%</span>
                     </div>
 
@@ -340,21 +385,22 @@ function openCookingMode() {
                         ${String(currentStep + 1).padStart(2, '0')}
                     </span>
 
-                    <p>${recipe.steps[currentStep]}</p>
+                    <p>${steps[currentStep]}</p>
                 </div>
 
                 <div class="cooking-navigation">
                     <button
                         class="previous-step"
+                        type="button"
                         ${currentStep === 0 ? 'disabled' : ''}
                     >
-                        Previous
+                        ${t('cooking.previous')}
                     </button>
 
-                    <button class="next-step">
+                    <button class="next-step" type="button">
                         ${currentStep === totalSteps - 1
-                            ? 'Finish Cooking'
-                            : 'Next Step'}
+                            ? t('cooking.finish')
+                            : t('cooking.next')}
                     </button>
                 </div>
 
@@ -389,14 +435,14 @@ function openCookingMode() {
         cookingMode.innerHTML = `
             <div class="cooking-container cooking-finished">
 
-                <i data-lucide="check-circle"></i>
+                <i data-lucide="circle-check"></i>
 
-                <h2>You're all done!</h2>
+                <h2>${t('cooking.doneTitle')}</h2>
 
-                <p>You've completed all the steps. Enjoy your meal!</p>
+                <p>${t('cooking.doneText')}</p>
 
-                <button class="finish-button">
-                    Back to Recipe
+                <button class="finish-button" type="button">
+                    ${t('cooking.backToRecipe')}
                 </button>
 
             </div>
@@ -415,6 +461,57 @@ function openCookingMode() {
     renderStep();
 }
 
-if (startCookingButton && recipe) {
-    startCookingButton.addEventListener('click', openCookingMode);
-}
+// =====================================================
+// One click listener for the whole recipe area.
+// It survives renderRecipe() because #recipe-details itself
+// is never replaced, only what's inside it.
+// =====================================================
+
+recipeDetails.addEventListener('click', event => {
+    if (!recipe) return;
+
+    const target = event.target;
+
+    const ingredientButton = target.closest('.add-ingredient-btn');
+
+    if (ingredientButton) {
+        toggleIngredient(Number(ingredientButton.dataset.index));
+        return;
+    }
+
+    if (target.closest('#add-all-grocery')) {
+        addIngredientsToGroceryList(getAllIngredientIndexes());
+        refreshGroceryButtons();
+        return;
+    }
+
+    if (target.closest('#start-cooking')) {
+        openCookingMode();
+        return;
+    }
+
+    if (target.closest('#save-to-collection')) {
+        openSaveModal();
+        return;
+    }
+
+    // The X button, or a click on the dark overlay around the modal
+    if (target.closest('#close-save-modal') || target.id === 'save-collection-modal') {
+        closeSaveModal();
+        return;
+    }
+
+    if (target.closest('#confirm-save-collection')) {
+        saveSelectedCollections();
+    }
+});
+
+// Page start
+
+renderRecipe();
+
+onPageRestore(renderRecipe);
+onLanguageChange(renderRecipe);
+
+initMobileNav();
+initLanguage();

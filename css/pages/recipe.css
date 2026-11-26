@@ -1,11 +1,27 @@
 /* Recipe Details Page */
 
-.recipe-details {
+/* Page container (same widths as the collection & grocery pages) */
+.recipe-page {
     max-width: var(--container-width);
     margin: 0 auto;
-    padding: 60px;
+    padding: 40px 60px 80px;
 }
 
+.recipe-page .back-link {
+    margin-bottom: 30px;
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.recipe-page .back-link:hover {
+    color: var(--color-accent);
+}
+
+.recipe-details {
+    padding-top: 30px;
+}
 
 .recipe-hero {
     display: grid;
@@ -138,6 +154,18 @@
     color: white;
 }
 
+/* Already on the grocery list: filled green */
+.add-ingredient-btn.added {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+/* Hovering an added one hints that clicking removes it */
+.add-ingredient-btn.added:hover {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
 .add-ingredient-btn svg {
     width: 16px;
     height: 16px;
@@ -215,8 +243,8 @@
 }
 
 @media (max-width: 900px) {
-    .recipe-details {
-        padding: 40px 30px;
+    .recipe-page {
+        padding: 30px 30px 60px;
     }
 
     .recipe-hero {
@@ -239,8 +267,8 @@
 }
 
 @media (max-width: 600px) {
-    .recipe-details {
-        padding: 30px 20px;
+    .recipe-page {
+        padding: 25px 20px 50px;
     }
 
     .recipe-hero {
@@ -536,24 +564,6 @@
     gap: 12px;
     margin-top: 30px;
     flex-wrap: wrap;
-}
-
-.recipe-nav-links {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-}
-
-.recipe-nav-links .back-link {
-    margin-bottom: 30px;
-    color: var(--color-text);
-    font-size: 14px;
-    font-weight: 600;
-    transition: color 0.2s ease;
-}
-
-.recipe-nav-links .back-link:hover {
-    color: var(--color-accent);
 }
 
 .save-collection-btn {

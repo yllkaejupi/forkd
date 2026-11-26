@@ -4,14 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="forkd - Your personal cooking companion.">
-    <title>forkd — Discover, Save & Cook</title>
+    <title data-i18n="pageTitles.home">forkd — Discover, Save & Cook</title>
 
-    <link rel="icon" type="image/png" href="assets/images/logo.png"> 
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
+
+    <script src="https://unpkg.com/lucide@1.24.0"></script>
+    <script type="module" src="js/main.js"></script>
 </head>
 <body>
 
@@ -43,11 +47,10 @@
                 <button class="language-option" data-lang="sq" type="button">SQ</button>
             </div>
 
-            <button class="menu-toggle" aria-label="Open navigation menu">
+            <button class="menu-toggle" type="button" aria-label="Open navigation menu" data-i18n-aria-label="nav.openMenu" aria-expanded="false">
                 <i data-lucide="menu"></i>
             </button>
         </nav>
-
     </header>
 
     <main>
@@ -123,19 +126,19 @@
                     <h2 data-i18n="collections.title">Your Collections</h2>
                 </div>
 
-                <button class="create-collection-btn" id="create-collection-btn" data-i18n="collections.new">
+                <button class="create-collection-btn" id="create-collection-btn" type="button">
                     <i data-lucide="plus"></i>
-                    New Collection
+                    <span data-i18n="collections.new">New Collection</span>
                 </button>
             </div>
 
             <div class="collection-modal" id="collection-modal">
                 <div class="collection-modal-content">
-                    <button class="close-modal-btn" id="close-modal-btn" type="button">
+                    <button class="close-modal-btn" id="close-modal-btn" type="button" aria-label="Close" data-i18n-aria-label="common.close">
                         <i data-lucide="x"></i>
                     </button>
 
-                    <p class="section-label" data-i18n="collections.createLabel">YOUR PERSONAL COOKBOOK</p>
+                    <p class="section-label" data-i18n="collections.label">YOUR PERSONAL COOKBOOK</p>
                     <h3 data-i18n="collections.createTitle">Create a Collection</h3>
                     <p class="modal-description" data-i18n="collections.description">
                         Give your collection a name to get started.
@@ -147,7 +150,7 @@
                         <input
                             type="text"
                             id="collection-name"
-                            data-i18n="collections.placeholder"
+                            data-i18n-placeholder="collections.namePlaceholder"
                             placeholder="e.g. Quick Dinners"
                             maxlength="30"
                             required
@@ -167,58 +170,55 @@
 
         <section class="seasonal" id="seasonal">
             <div class="seasonal-image">
-                <img src="assets/images/seasonal-autumn.jpg" alt="Warm roasted pumpkin soup with fresh herbs">
+                <!-- Image, title, description and link are set by main.js for the current season -->
+                <img id="seasonal-image" src="assets/images/seasonal-autumn.jpg" alt="Warm roasted pumpkin soup with fresh herbs">
             </div>
 
             <div class="seasonal-content">
                 <p class="section-label" data-i18n="seasonal.label">IN SEASON</p>
-                <h2 data-i18n="seasonal.title">A little taste of autumn.</h2>
+                <h2 id="seasonal-title">A little taste of autumn.</h2>
 
-                <p class="seasonal-description" data-i18n="seasonal.description">
-                    Rich flavors, dishes full of warmth and the best of the season. 
+                <p class="seasonal-description" id="seasonal-description">
+                    Rich flavors, dishes full of warmth and the best of the season.
                     Discover recipes that make these days a little more delicious.
                 </p>
 
-                <a href="pages/all-recipes.html?tag=seasonal" class="seasonal-link" data-i18n="seasonal.explore">
-                    Explore seasonal recipes
+                <a href="pages/all-recipes.html?tag=autumn" class="seasonal-link" id="seasonal-link">
+                    <span data-i18n="seasonal.link">Explore seasonal recipes</span>
                     <i data-lucide="arrow-right"></i>
                 </a>
             </div>
         </section>
 
     </main>
-    
+
     <footer class="footer">
         <div class="footer-main">
             <div class="footer-brand">
-                <a href="#" class="footer-logo">forkd.</a>
-                <p>Discover recipes, save your favorites and make something delicious.</p>
+                <a href="#discover" class="footer-logo">forkd.</a>
+                <p data-i18n="footer.tagline">Discover recipes, save your favorites and make something delicious.</p>
             </div>
             <div class="footer-links">
-                <h3>Explore</h3>
-                <a href="#discover">Discover</a>
-                <a href="#categories">Categories</a>
-                <a href="#popular-recipes">Popular Recipes</a>
+                <h3 data-i18n="footer.explore">Explore</h3>
+                <a href="#discover" data-i18n="nav.discover">Discover</a>
+                <a href="#categories" data-i18n="footer.categories">Categories</a>
+                <a href="#popular-recipes" data-i18n="footer.popularRecipes">Popular Recipes</a>
             </div>
             <div class="footer-links">
-                <h3>Your Kitchen</h3>
-                <a href="#collections">Collections</a>
-                <a href="pages/grocery-list.html">Grocery List</a>
+                <h3 data-i18n="footer.yourKitchen">Your Kitchen</h3>
+                <a href="#collections" data-i18n="nav.collections">Collections</a>
+                <a href="pages/grocery-list.html" data-i18n="nav.groceryList">Grocery List</a>
             </div>
             <div class="footer-note">
-                <h3>A little reminder</h3>
-                <p>Good food doesn't have to be complicated. Just start with something you love.</p>
+                <h3 data-i18n="footer.reminderTitle">A little reminder</h3>
+                <p data-i18n="footer.reminderText">Good food doesn't have to be complicated. Just start with something you love.</p>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>© 2026 forkd. Made with love for food.</p>
-            <a href="#discover">Back to top ↑</a>
+            <p data-i18n="footer.copyright">© 2026 forkd. Made with love for food.</p>
+            <a href="#discover" data-i18n="footer.backToTop">Back to top ↑</a>
         </div>
     </footer>
 
-    <script type="module" src="js/main.js"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
-    <script> lucide.createIcons(); </script>
 </body>
 </html>

@@ -1,10 +1,14 @@
 import { recipes } from './data/recipes.js';
-import { getFavorites, toggleFavorite, getCollections, createCollection } from './storage.js';
+import { seasons, getCurrentSeason } from './data/seasons.js';
+import { getFavorites, getCollections, createCollection } from './storage.js';
+import { onPageRestore, renderRecipeCard, initFavoriteButtons, syncFavoriteButtons, initMobileNav, escapeHTML } from './ui.js';
+import { initLanguage, onLanguageChange, t } from './i18n/language.js';
 
 const recipeGrid = document.querySelector('#recipe-grid');
 const collectionsGrid = document.querySelector('#collections-grid');
 const popularRecipes = recipes.filter(recipe => recipe.popular).slice(0, 8);
 
+// Collections
 function renderCollections() {
     const collections = getCollections();
     const favorites = getFavorites();
@@ -15,8 +19,8 @@ function renderCollections() {
                 <i data-lucide="heart"></i>
             </div>
 
-            <h3>My Favorites</h3>
-            <p>${favorites.length} saved recipes</p>
+            <h3>${t('collections.myFavorites')}</h3>
+            <p>${t('collections.savedCount', { count: favorites.length })}</p>
         </a>
     `;
 
@@ -26,8 +30,8 @@ function renderCollections() {
                 <i data-lucide="book-heart"></i>
             </div>
 
-            <h3>${collection.name}</h3>
-            <p>${collection.recipeIds.length} recipes</p>
+            <h3>${escapeHTML(collection.name)}</h3>
+            <p>${t('common.recipeCount', { count: collection.recipeIds.length })}</p>
         </a>
     `).join('');
 
@@ -80,149 +84,77 @@ collectionForm.addEventListener('submit', event => {
     collectionForm.reset();
 });
 
-// Search elements
-const searchInput = document.querySelector('#recipe-search');
-const searchButton = document.querySelector('#search-button');
-
-// Render recipes
-function renderRecipes(filteredRecipes = popularRecipes) {
+// Popular Recipes
+function renderRecipes() {
     const favorites = getFavorites();
 
-    if (filteredRecipes.length === 0) {
-        recipeGrid.innerHTML = `
-            <p class="no-results">
-                No recipes found. Try another search!
-            </p>
-        `;
-        return;
-    }
-
-    recipeGrid.innerHTML = filteredRecipes.map(recipe => {
-        const totalTime = recipe.prepTime + recipe.cookTime;
-        const isFavorite = favorites.includes(recipe.id);
-
-        return `
-            <article class="recipe-card">
-                <div class="recipe-image">
-                    <img src="${recipe.image}" alt="${recipe.title}">
-
-                    <button
-                        class="favorite-btn ${isFavorite ? 'active' : ''}"
-                        type="button"
-                        data-recipe-id="${recipe.id}"
-                        aria-label="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
-                        aria-pressed="${isFavorite}"
-                    >
-                        <i data-lucide="heart"></i>
-                    </button>
-                </div>
-
-                <div class="recipe-info">
-                    <a href="pages/recipe.html?id=${recipe.id}" class="recipe-card-link">
-                        <div class="recipe-info">
-                            <p class="recipe-category">${recipe.category.toUpperCase()}</p>
-                            <h3>${recipe.title}</h3>
-
-                            <div class="recipe-meta">
-                                <span>
-                                    <i data-lucide="clock"></i>
-                                    ${totalTime} min
-                                </span>
-                                <span>
-                                    <i data-lucide="chef-hat"></i>
-                                    ${recipe.difficulty}
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </article>
-        `;
-    }).join('');
+    recipeGrid.innerHTML = popularRecipes
+        .map(recipe => renderRecipeCard(recipe, {
+            isFavorite: favorites.includes(recipe.id)
+        }))
+        .join('');
 
     lucide.createIcons();
 }
 
 renderRecipes();
 
-// Search functionality
-function searchRecipes() {
-    const searchTerm = searchInput.value.trim().toLowerCase();
+// Search
+const searchInput = document.querySelector('#recipe-search');
+const searchButton = document.querySelector('#search-button');
 
-    const filteredRecipes = searchTerm
-        ? recipes.filter(recipe => {
-            const searchableContent = [
-                recipe.title,
-                recipe.description,
-                recipe.category,
-                ...recipe.ingredients.map(ingredient => ingredient.name),
-                ...recipe.tags
-            ].join(' ').toLowerCase();
+function goToSearchResults() {
+    const searchTerm = searchInput.value.trim();
 
-            return searchableContent.includes(searchTerm);
-        })
-        : popularRecipes;
-
-    renderRecipes(filteredRecipes);
-
-    const recipesHeading = document.querySelector('#recipes-heading');
-
-    recipesHeading.textContent = searchTerm
-        ? 'Search Results'
-        : 'Popular Recipes';
-
-    if (searchTerm) {
-        document.querySelector('#popular-recipes').scrollIntoView({
-            behavior: 'smooth'
-        });
-    }
+    // encodeURIComponent makes the text safe for a URL:
+    // "mac & cheese" becomes "mac%20%26%20cheese"
+    window.location.href = searchTerm
+        ? `pages/all-recipes.html?search=${encodeURIComponent(searchTerm)}`
+        : 'pages/all-recipes.html';
 }
 
-// Search button click
-searchButton.addEventListener('click', searchRecipes);
+searchButton.addEventListener('click', goToSearchResults);
 
-// Search with Enter key
 searchInput.addEventListener('keydown', event => {
     if (event.key === 'Enter') {
-        searchRecipes();
+        goToSearchResults();
     }
 });
 
-// Favorites functionality
-recipeGrid.addEventListener('click', event => {
-    const favoriteButton = event.target.closest('.favorite-btn');
+// Seasonal section
+// Picks the season from today's date.
+// For testing, force one with a URL parameter: index.html?season=summer
 
-    if (!favoriteButton) return;
+const seasonOverride = new URLSearchParams(window.location.search).get('season');
+const currentSeason = getCurrentSeason(seasonOverride);
 
-    const recipeId = Number(favoriteButton.dataset.recipeId);
-    const updatedFavorites = toggleFavorite(recipeId);
+function renderSeasonal() {
+    const seasonImage = document.querySelector('#seasonal-image');
 
-    const isFavorite = updatedFavorites.includes(recipeId);
+    seasonImage.src = seasons[currentSeason].image;
+    seasonImage.alt = t(`seasons.${currentSeason}.imageAlt`);
 
-    favoriteButton.classList.toggle('active', isFavorite);
+    document.querySelector('#seasonal-title').textContent = t(`seasons.${currentSeason}.title`);
+    document.querySelector('#seasonal-description').textContent = t(`seasons.${currentSeason}.description`);
+    document.querySelector('#seasonal-link').href = `pages/all-recipes.html?tag=${currentSeason}`;
+}
 
-    favoriteButton.setAttribute(
-        'aria-label',
-        isFavorite ? 'Remove from favorites' : 'Add to favorites'
-    );
+renderSeasonal();
 
-    favoriteButton.setAttribute('aria-pressed', isFavorite);
+// Favorites (heart buttons) + keep the "My Favorites" count in sync
+initFavoriteButtons(recipeGrid, renderCollections);
+
+// Keeping the page up to date
+onPageRestore(() => {
+    renderCollections();
+    syncFavoriteButtons();
 });
 
-// Mobile navigation
-const menuToggle = document.querySelector('.menu-toggle');
-const mobileMenu = document.querySelector('.mobile-menu');
+onLanguageChange(() => {
+    renderCollections();
+    renderRecipes();
+    renderSeasonal();
+});
 
-if (menuToggle && mobileMenu) {
-    menuToggle.addEventListener('click', () => {
-        mobileMenu.classList.toggle('active');
-    });
-
-    const mobileLinks = mobileMenu.querySelectorAll('a');
-
-    mobileLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            mobileMenu.classList.remove('active');
-        });
-    });
-}
+initMobileNav();
+initLanguage();

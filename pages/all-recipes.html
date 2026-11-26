@@ -4,18 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Browse every recipe on forkd.">
-
     <title>All Recipes | forkd</title>
 
-    <link rel="icon" type="image/png" href="../assets/images/logo.png"> 
+    <link rel="icon" type="image/png" href="../assets/images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/pages/collection.css">
+
+    <script src="https://unpkg.com/lucide@1.24.0"></script>
+    <script type="module" src="../js/all-recipes.js"></script>
 </head>
 
 <body>
@@ -27,28 +28,28 @@
             </a>
 
             <ul class="nav-links">
-                <li><a href="../index.html#discover">Discover</a></li>
-                <li><a href="../index.html#collections">Collections</a></li>
-                <li><a href="grocery-list.html">Grocery List</a></li>
+                <li><a href="../index.html#discover" data-i18n="nav.discover">Discover</a></li>
+                <li><a href="../index.html#collections" data-i18n="nav.collections">Collections</a></li>
+                <li><a href="grocery-list.html" data-i18n="nav.groceryList">Grocery List</a></li>
             </ul>
 
             <div class="mobile-menu">
-                <a href="../index.html#discover">Discover</a>
-                <a href="../index.html#collections">Collections</a>
-                <a href="grocery-list.html">Grocery List</a>
+                <a href="../index.html#discover" data-i18n="nav.discover">Discover</a>
+                <a href="../index.html#collections" data-i18n="nav.collections">Collections</a>
+                <a href="grocery-list.html" data-i18n="nav.groceryList">Grocery List</a>
 
                 <div class="mobile-language">
-                    <button class="language-option active" type="button">EN</button>
-                    <button class="language-option" type="button">SQ</button>
+                    <button class="language-option active" data-lang="en" type="button">EN</button>
+                    <button class="language-option" data-lang="sq" type="button">SQ</button>
                 </div>
             </div>
 
             <div class="language-switcher">
-                <button class="language-option active" type="button">EN</button>
-                <button class="language-option" type="button">SQ</button>
+                <button class="language-option active" data-lang="en" type="button">EN</button>
+                <button class="language-option" data-lang="sq" type="button">SQ</button>
             </div>
 
-            <button class="menu-toggle" aria-label="Open navigation menu">
+            <button class="menu-toggle" type="button" aria-label="Open navigation menu" data-i18n-aria-label="nav.openMenu" aria-expanded="false">
                 <i data-lucide="menu"></i>
             </button>
         </nav>
@@ -58,15 +59,65 @@
 
         <a href="../index.html#discover" class="back-link">
             <i data-lucide="arrow-left"></i>
-            Back to Discover
+            <span data-i18n="common.backToDiscover">Back to Discover</span>
         </a>
 
         <section class="collection-header">
-            <p class="section-label">THE FULL COOKBOOK</p>
+            <p class="section-label" data-i18n="allRecipes.label">THE FULL COOKBOOK</p>
 
             <h1 id="all-recipes-title">All Recipes</h1>
 
             <p id="all-recipes-count">0 recipes</p>
+        </section>
+
+        <section class="recipe-filters" id="recipe-filters">
+            <div class="filter-search">
+                <i data-lucide="search"></i>
+                <input
+                    type="search"
+                    id="filter-search"
+                    placeholder="Search for recipes or ingredients..."
+                    data-i18n-placeholder="hero.searchPlaceholder"
+                    aria-label="Search recipes"
+                    data-i18n-aria-label="filters.searchLabel"
+                >
+            </div>
+
+            <div class="filter-group">
+                <span class="filter-label" data-i18n="filters.category">Category</span>
+                <div class="filter-chips">
+                    <button type="button" class="filter-chip" data-filter="category" data-value="breakfast" data-i18n="categories.breakfast">Breakfast</button>
+                    <button type="button" class="filter-chip" data-filter="category" data-value="lunch" data-i18n="categories.lunch">Lunch</button>
+                    <button type="button" class="filter-chip" data-filter="category" data-value="dinner" data-i18n="categories.dinner">Dinner</button>
+                    <button type="button" class="filter-chip" data-filter="category" data-value="desserts" data-i18n="categories.desserts">Desserts</button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <span class="filter-label" data-i18n="filters.difficulty">Difficulty</span>
+                <div class="filter-chips">
+                    <button type="button" class="filter-chip" data-filter="difficulty" data-value="easy" data-i18n="difficulty.easy">Easy</button>
+                    <button type="button" class="filter-chip" data-filter="difficulty" data-value="medium" data-i18n="difficulty.medium">Medium</button>
+                    <button type="button" class="filter-chip" data-filter="difficulty" data-value="hard" data-i18n="difficulty.hard">Hard</button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <span class="filter-label" data-i18n="filters.time">Time</span>
+                <div class="filter-chips">
+                    <button type="button" class="filter-chip" data-filter="maxTime" data-value="30" data-i18n="filters.under30">Up to 30 min</button>
+                    <button type="button" class="filter-chip" data-filter="maxTime" data-value="60" data-i18n="filters.under60">Up to 60 min</button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <span class="filter-label" data-i18n="filters.diet">Diet</span>
+                <div class="filter-chips">
+                    <button type="button" class="filter-chip" data-filter="diet" data-value="vegetarian" data-i18n="filters.vegetarian">Vegetarian</button>
+                </div>
+            </div>
+
+            <button type="button" class="clear-filters-btn" id="clear-filters" data-i18n="filters.clear" hidden>Clear filters</button>
         </section>
 
         <section class="collection-recipes">
@@ -77,8 +128,33 @@
 
     </main>
 
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script type="module" src="../js/all-recipes.js"></script>
+    <footer class="footer">
+        <div class="footer-main">
+            <div class="footer-brand">
+                <a href="../index.html" class="footer-logo">forkd.</a>
+                <p data-i18n="footer.tagline">Discover recipes, save your favorites and make something delicious.</p>
+            </div>
+            <div class="footer-links">
+                <h3 data-i18n="footer.explore">Explore</h3>
+                <a href="../index.html#discover" data-i18n="nav.discover">Discover</a>
+                <a href="../index.html#categories" data-i18n="footer.categories">Categories</a>
+                <a href="../index.html#popular-recipes" data-i18n="footer.popularRecipes">Popular Recipes</a>
+            </div>
+            <div class="footer-links">
+                <h3 data-i18n="footer.yourKitchen">Your Kitchen</h3>
+                <a href="../index.html#collections" data-i18n="nav.collections">Collections</a>
+                <a href="grocery-list.html" data-i18n="nav.groceryList">Grocery List</a>
+            </div>
+            <div class="footer-note">
+                <h3 data-i18n="footer.reminderTitle">A little reminder</h3>
+                <p data-i18n="footer.reminderText">Good food doesn't have to be complicated. Just start with something you love.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p data-i18n="footer.copyright">© 2026 forkd. Made with love for food.</p>
+            <a href="#" data-i18n="footer.backToTop">Back to top ↑</a>
+        </div>
+    </footer>
 
 </body>
 </html>

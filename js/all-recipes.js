@@ -1,138 +1,192 @@
 import { recipes } from './data/recipes.js';
-import { getFavorites, toggleFavorite } from './storage.js';
-
-// Optional filters from the URL:
-//   all-recipes.html?category=dinner
-//   all-recipes.html?tag=seasonal
-const params = new URLSearchParams(window.location.search);
-const categoryFilter = params.get('category');
-const tagFilter = params.get('tag');
+import { seasons } from './data/seasons.js';
+import { getFavorites } from './storage.js';
+import { onPageRestore, renderRecipeCard, initFavoriteButtons, initMobileNav, matchesSearch } from './ui.js';
+import { initLanguage, onLanguageChange, t } from './i18n/language.js';
 
 // Page elements
 const pageTitle = document.querySelector('#all-recipes-title');
 const pageCount = document.querySelector('#all-recipes-count');
 const recipeGrid = document.querySelector('#all-recipes-grid');
+const filterSection = document.querySelector('#recipe-filters');
+const searchInput = document.querySelector('#filter-search');
+const clearButton = document.querySelector('#clear-filters');
+const filterChips = document.querySelectorAll('.filter-chip');
+
+// =====================================================
+// Filter state
+// All filters live in the URL, so a filtered view can be
+// bookmarked, shared, refreshed, and survives the Back button:
+//   all-recipes.html?category=dinner&difficulty=easy&maxTime=30
+// `tag` has no chip: it comes from links like ?tag=winter (the seasonal section)
+// =====================================================
+
+const FILTER_KEYS = ['search', 'category', 'difficulty', 'maxTime', 'diet', 'tag'];
+
+// Turns the URL into an object: { search: '', category: 'dinner', ... }
+function readFiltersFromURL() {
+    const params = new URLSearchParams(window.location.search);
+
+    return Object.fromEntries(
+        FILTER_KEYS.map(key => [key, params.get(key) || ''])
+    );
+}
+
+// Writes the current filters back into the URL (empty ones are left out).
+// replaceState changes the address bar without adding a history entry,
+// so pressing Back leaves the page instead of undoing one chip at a time.
+function writeFiltersToURL() {
+    const params = new URLSearchParams();
+
+    FILTER_KEYS.forEach(key => {
+        if (filters[key]) {
+            params.set(key, filters[key]);
+        }
+    });
+
+    const query = params.toString();
+
+    history.replaceState(null, '', query ? `?${query}` : window.location.pathname);
+}
+
+let filters = readFiltersFromURL();
+
+function hasActiveFilters() {
+    return FILTER_KEYS.some(key => filters[key]);
+}
+
+// A recipe is shown only if it passes EVERY active filter
+function matchesFilters(recipe) {
+    const totalTime = recipe.prepTime + recipe.cookTime;
+
+    if (filters.category && recipe.category !== filters.category) return false;
+    if (filters.difficulty && recipe.difficulty !== filters.difficulty) return false;
+    if (filters.maxTime && totalTime > Number(filters.maxTime)) return false;
+    if (filters.diet && !recipe.tags.includes(filters.diet)) return false;
+    if (filters.tag && !recipe.tags.includes(filters.tag)) return false;
+    if (filters.search && !matchesSearch(recipe, filters.search)) return false;
+
+    return true;
+}
 
 function capitalize(text) {
     return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-// Decide which recipes to show
-let visibleRecipes = recipes;
+function getPageTitle() {
+    if (filters.category) return t(`categories.${filters.category}`);
+    if (seasons[filters.tag]) return t(`seasons.${filters.tag}.recipesTitle`);
+    if (filters.tag) return capitalize(filters.tag);
 
-if (categoryFilter) {
-    visibleRecipes = recipes.filter(recipe => recipe.category === categoryFilter);
-    pageTitle.textContent = capitalize(categoryFilter);
-} else if (tagFilter) {
-    visibleRecipes = recipes.filter(recipe => recipe.tags.includes(tagFilter));
-    pageTitle.textContent = `${capitalize(tagFilter)} Recipes`;
+    return t('allRecipes.title');
 }
 
-// Update recipe count
-pageCount.textContent = `${visibleRecipes.length} ${
-    visibleRecipes.length === 1 ? 'recipe' : 'recipes'
-}`;
+// Render
 
-// Render recipes
+// Highlights the active chips and shows/hides "Clear filters"
+function updateFilterControls() {
+    filterChips.forEach(chip => {
+        const isActive = filters[chip.dataset.filter] === chip.dataset.value;
+
+        chip.classList.toggle('active', isActive);
+        chip.setAttribute('aria-pressed', isActive);
+    });
+
+    clearButton.hidden = !hasActiveFilters();
+}
+
 function renderRecipes() {
-    const favorites = getFavorites();
+    const visibleRecipes = recipes.filter(matchesFilters);
+
+    pageTitle.textContent = getPageTitle();
+    document.title = `${getPageTitle()} | forkd`;
+    pageCount.textContent = t('common.recipeCount', { count: visibleRecipes.length });
+
+    updateFilterControls();
 
     if (visibleRecipes.length === 0) {
         recipeGrid.innerHTML = `
-            <p class="no-results">
-                No recipes found.
-            </p>
+            <div class="no-results">
+                <p>${t('filters.noResults')}</p>
+                <button type="button" class="clear-filters-btn" data-clear-filters>
+                    ${t('filters.clear')}
+                </button>
+            </div>
         `;
         return;
     }
 
-    recipeGrid.innerHTML = visibleRecipes.map(recipe => {
-        const totalTime = recipe.prepTime + recipe.cookTime;
-        const isFavorite = favorites.includes(recipe.id);
+    const favorites = getFavorites();
 
-        return `
-            <article class="recipe-card">
-                <div class="recipe-image">
-                    <img src="../${recipe.image}" alt="${recipe.title}">
-
-                    <button
-                        class="favorite-btn ${isFavorite ? 'active' : ''}"
-                        type="button"
-                        data-recipe-id="${recipe.id}"
-                        aria-label="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}"
-                        aria-pressed="${isFavorite}"
-                    >
-                        <i data-lucide="heart"></i>
-                    </button>
-                </div>
-
-                <div class="recipe-info">
-                    <a href="recipe.html?id=${recipe.id}" class="recipe-card-link">
-                        <p class="recipe-category">
-                            ${recipe.category.toUpperCase()}
-                        </p>
-
-                        <h3>${recipe.title}</h3>
-
-                        <div class="recipe-meta">
-                            <span>
-                                <i data-lucide="clock"></i>
-                                ${totalTime} min
-                            </span>
-
-                            <span>
-                                <i data-lucide="chef-hat"></i>
-                                ${recipe.difficulty}
-                            </span>
-                        </div>
-                    </a>
-                </div>
-            </article>
-        `;
-    }).join('');
+    recipeGrid.innerHTML = visibleRecipes
+        .map(recipe => renderRecipeCard(recipe, {
+            basePath: '../',
+            isFavorite: favorites.includes(recipe.id)
+        }))
+        .join('');
 
     lucide.createIcons();
 }
 
+// Changing filters
+
+function applyFilters() {
+    writeFiltersToURL();
+    renderRecipes();
+}
+
+function clearFilters() {
+    FILTER_KEYS.forEach(key => {
+        filters[key] = '';
+    });
+
+    searchInput.value = '';
+    applyFilters();
+}
+
+// One listener for all chips + the Clear button (event delegation).
+// Clicking an active chip turns it off again.
+filterSection.addEventListener('click', event => {
+    const chip = event.target.closest('.filter-chip');
+
+    if (chip) {
+        const { filter, value } = chip.dataset;
+
+        filters[filter] = filters[filter] === value ? '' : value;
+        applyFilters();
+        return;
+    }
+
+    if (event.target.closest('#clear-filters')) {
+        clearFilters();
+    }
+});
+
+// Search updates the results as you type.
+searchInput.addEventListener('input', () => {
+    filters.search = searchInput.value;
+    applyFilters();
+});
+
+// The "Clear filters" button inside the empty state
+recipeGrid.addEventListener('click', event => {
+    if (event.target.closest('[data-clear-filters]')) {
+        clearFilters();
+    }
+});
+
+// Page start
+
+searchInput.value = filters.search;
+
 renderRecipes();
 
-// Favorites functionality
-recipeGrid.addEventListener('click', event => {
-    const favoriteButton = event.target.closest('.favorite-btn');
+initFavoriteButtons(recipeGrid);
 
-    if (!favoriteButton) return;
-
-    const recipeId = Number(favoriteButton.dataset.recipeId);
-    const updatedFavorites = toggleFavorite(recipeId);
-
-    const isFavorite = updatedFavorites.includes(recipeId);
-
-    favoriteButton.classList.toggle('active', isFavorite);
-
-    favoriteButton.setAttribute(
-        'aria-label',
-        isFavorite ? 'Remove from favorites' : 'Add to favorites'
-    );
-
-    favoriteButton.setAttribute('aria-pressed', isFavorite);
-});
+onPageRestore(renderRecipes);
+onLanguageChange(renderRecipes);
 
 lucide.createIcons();
 
-// Mobile Navigation
-const menuToggle = document.querySelector('.menu-toggle');
-const mobileMenu = document.querySelector('.mobile-menu');
-
-if (menuToggle && mobileMenu) {
-    menuToggle.addEventListener('click', () => {
-        mobileMenu.classList.toggle('active');
-    });
-
-    const mobileLinks = mobileMenu.querySelectorAll('a');
-
-    mobileLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            mobileMenu.classList.remove('active');
-        });
-    });
-}
+initMobileNav();
+initLanguage();
